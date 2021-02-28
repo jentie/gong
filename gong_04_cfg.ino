@@ -2,7 +2,8 @@
     gong-04.cfg - Achtsamkeit-Glocke
 
     Jens, 2021-02-28
-
+    MIT License
+    
     sound files based on samples from
     freesound https://freesound.org/
     with appropriate licenses
@@ -11,8 +12,29 @@
     note:
     'partition scheme: no OTA' --> 1.3 Mbyte wav files in PROGMEM
 
-    MIT License
-
+         +---------------+
+         |o    ANT      o|
+         |o ___________ o|
+         |o             o|
+         |o             o|
+         |o          D22o|- I2S
+    I2S -|oD25          o|
+    I2S -|oD26          o|
+         |o          D18o|- Vol
+    key -|oD33          o| 
+         |o          D10o|- Snd
+         |o           D9o|- Snd  
+         |o             o|
+         |o             o|
+         |o             o|
+         |o             o|
+         |o             o|
+         |o             o|       
+         |o3V3        ENo|
+         |oGND       GNDo|
+         |o5V  |USB| 3V3o|
+         +-----+---+-----+
+    
 */
 
 //#include <WiFi.h>
@@ -54,18 +76,16 @@ AudioFileSourcePROGMEM *file;
 AudioOutputI2S *out;
 
 
-void show_help() {
-
-  const char helpstr[] = "\
-\nGong - Achtsamkeits-Glocke\n\
-bBcdfghlpto - sounds\n\
-0           - sound off\n\
-1..9        - volume\n\
-s           - speed up timer\n\
-?           - help\n";
-
-  Serial.println(helpstr);
-}
+const char helpstr[] = "\
+\nAchtsamkeits-Glocke\n\
+BCGH   - sounds used\n\
+bflpto - other sounds\n\
+0      - sound off\n\
+1..9   - volume\n\
+T      - show timer\n\
+s      - speed up timer\n\
+!      - Reset\n\
+?      - help\n";
 
 
 void setup() {
@@ -74,7 +94,7 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
 
-  show_help();
+  Serial.println(helpstr);
 
   // input pins
   pinMode(TRIGGER, INPUT_PULLUP);
@@ -88,9 +108,9 @@ void setup() {
   out = new AudioOutputI2S();
 
   if (digitalRead(SNDVOL))                          // pin D18
-    out -> SetGain(0.1);                            // volume quite low
+    out -> SetGain(0.1);                            // volume quote low
   else
-    out -> SetGain(0.05);                           // volume quite low
+    out -> SetGain(0.05);                           // volume very low
   out -> SetPinout(26, 25, 22);
 
   count = wait;
@@ -111,41 +131,54 @@ void loop() {
     }
 
   char ch;
+  char fb = ' ';                                    // neutral feedback, no sound
+
   if (Serial.available() > 0) {
     ch = Serial.read();                             // some serial input, using first character
     while (Serial.available())
       Serial.read();
-    Serial.println("--> serial trigger");
+    Serial.print("--> serial input: ");
+    Serial.println(ch);
 
-    if ((ch >= '0') && (ch <= '9')) {               // Volume: '0' - '9'
-      float vol = (float)(ch - '0') / 20;           // volume 5 = 1/4
+    if (ch < ' ')                                   // drop control characters
+      ;
+    else if ((ch >= '0') && (ch <= '9')) {          // Volume: '0' - '9'
+      float vol = (float)(ch - '0') / 25;
       out -> SetGain(vol);
       Serial.print("vol: ");
       Serial.println(vol);
-      file = new AudioFileSourcePROGMEM( feedback_wav, sizeof(feedback_wav) );
-      wav = new AudioGeneratorWAV();
-      wav->begin(file, out);
+      fb = '+';
     } else if (ch == 's') {                         // speed up timer / shortcut
       count = 1;
       previousMillis = millis();
       Serial.println("shortcut");
-    } else if (ch == '?')
-      show_help();
-    else {
-
+      fb = '+';
+    } else if (ch == '?') {                         // help
+      Serial.println(helpstr);
+    } else if (ch == 'T') {
+      Serial.print("timer: ");                      // show time left
+      Serial.println(count);
+    } else if (ch == '!') {
+      Serial.println("reset...");                   // reset ESP32
+      Serial.println(".");
+      Serial.println(".");
+      Serial.println(".");
+      ESP.restart();
+    } else {
+      fb = '#';                                     // play selected sound
       if (ch == 'b')
         file = new AudioFileSourcePROGMEM( bell_wav, sizeof(bell_wav) );
       else if (ch == 'B')
         file = new AudioFileSourcePROGMEM( bowl_wav, sizeof(bowl_wav) );
-      else if (ch == 'c')
+      else if (ch == 'C')
         file = new AudioFileSourcePROGMEM( clock_wav, sizeof(clock_wav) );
       else if (ch == 'd')
         file = new AudioFileSourcePROGMEM( dingdong_wav, sizeof(dingdong_wav) );
       else if (ch == 'f')
         file = new AudioFileSourcePROGMEM( feedback_wav, sizeof(feedback_wav) );
-      else if (ch == 'g')
+      else if (ch == 'G')
         file = new AudioFileSourcePROGMEM( gong_wav, sizeof(gong_wav) );
-      else if (ch == 'h')
+      else if (ch == 'H')
         file = new AudioFileSourcePROGMEM( horn_wav, sizeof(horn_wav) );
       else if (ch == 'l')
         file = new AudioFileSourcePROGMEM( laser_wav, sizeof(laser_wav) );
@@ -154,12 +187,17 @@ void loop() {
       else if (ch == 't')
         file = new AudioFileSourcePROGMEM( tin_wav, sizeof(tin_wav) );
       else
+        fb = '-';                                   // ... no sound, negative feedback
+    }
+    if (fb != ' ') {
+      if (fb == '+')
+        file = new AudioFileSourcePROGMEM( feedback_wav, sizeof(feedback_wav) );
+      if (fb == '-')
         file = new AudioFileSourcePROGMEM( over_wav, sizeof(over_wav) );
-
       wav = new AudioGeneratorWAV();
       wav->begin(file, out);
     }
-  }
+  } // serial input
 
   if (digitalRead(TRIGGER) == 0) {
     delay(100);
