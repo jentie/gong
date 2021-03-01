@@ -29,11 +29,13 @@
          |o             o|
          |o             o|
          |o             o|
-         |o             o|       
-         |o3V3        ENo|
+  -4k7R--|oIO0          o|       
+  |------|o3V3        ENo|
          |oGND       GNDo|
          |o5V  |USB| 3V3o|
          +-----+---+-----+
+
+  pull-up IO0 for power-up reset       
     
 */
 
