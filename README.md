@@ -33,7 +33,6 @@ versions:
 ```
 
 
-
 remarks:
 * board: ESP32 pico kit
 * note: 'partition scheme: no OTA' --> 1.3 Mbyte wav files in PROGMEM
@@ -42,6 +41,13 @@ remarks:
 * editing with https://www.audacityteam.org/
 * conversion using sox http://sox.sourceforge.net/
 
+
+usage:
+* power (and optional commands) via usb
+* runs silently for 60 min and plays sound (hardware selected)
+* ⏸️ ☕ 🧘 __have a break__ 🧘 ☕ ⏸️ 
+* push buttons 'key' starts new cycle of 60 min
+* LED shows elapsed time via duty cycle
 
 
 commands (via USB / serial interface):
@@ -56,4 +62,5 @@ s       - speed up timer
 ?       - help
 ```
 Bowl, Clock, _Gong_, Horn
+
 bicycle bell, ding-dong, feedback, laser, power-up, tin, over
