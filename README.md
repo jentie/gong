@@ -64,9 +64,11 @@ s       - speed up timer
 !       - Reset
 ?       - help
 ```
-Bowl, Clock, _Gong_, Horn
+__B__owl, __C__lock, __Gong__, __H__orn
 
 bicycle bell, ding-dong, feedback, laser, power-up, tin, over
+
+note: beware of hardware reset via serial interface flow control (terminal with flow controll off, connect to usb)
 
 
 ![Gong innen](gong-innen.jpg)
