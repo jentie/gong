@@ -1,3 +1,6 @@
+![Gong aussen](gong-aussen.jpg)
+
+
 # Achtsamkeits-Glocke #
 
 ESP32 connected to I2S audio breakout, see https://learn.sparkfun.com/tutorials/i2s-audio-breakout-hookup-guide
@@ -64,3 +67,6 @@ s       - speed up timer
 Bowl, Clock, _Gong_, Horn
 
 bicycle bell, ding-dong, feedback, laser, power-up, tin, over
+
+
+![Gong innen](gong-innen.jpg)
