@@ -8,6 +8,7 @@ ESP32 connected to I2S audio breakout, see https://learn.sparkfun.com/tutorials/
 versions:
 * 04-cfg - configuration inputs Volume / Sound
 * 05-led - timer estimation based on LED duty cycle
+* 06-ser - disabled serial communication w/o terminal attached
 
 
 ```
@@ -68,7 +69,7 @@ Bowl, Clock, _Gong_, Horn
 
 bicycle bell, ding-dong, feedback, laser, power-up, tin, over
 
-note: beware of hardware reset via serial interface flow control ( 1. use terminal w/o flow control, 2. connect to usb)
+{note: in case of addtional power supply, be aware of hardware reset via serial interface flow control (1st step: use terminal w/o flow control, 2nd step: connect to USB)
 
 
 ![Gong innen](gong-innen.jpg)
